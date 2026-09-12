@@ -1,33 +1,37 @@
-name : CI-CD
+name: CI-CD
 
 on:
   push:
     branches:
-        -main
+      - main
+
 jobs:
-  build-an deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      -name:checkout code
-       uses:actions/cyesheckout@v4
-      -name: Log in to Docker Hub
-       uses: docker/login-action@V3
-       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -name: Build and Push Image
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: ./app
           push: true
           tags: rtakashdev/rtp-platform-app:${{ github.sha }}
-      -name : Update deployment manifest
-         run : |
-           sed -i "s|image: rtp-platform-app:.*|image: rtakashdev/rtp-platform-app:${{ github.sha }}|" manifests/flask-deployment.yaml
+
+      - name: Update deployment manifest
+        run: |
+          sed -i "s|image: rtp-platform-app:.*|image: rtakashdev/rtp-platform-app:${{ github.sha }}|" manifests/flask-deployment.yaml
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update image tag to ${{ github.sha }}" 
-    
+          commit_message: "Update image tag to ${{ github.sha }}"
