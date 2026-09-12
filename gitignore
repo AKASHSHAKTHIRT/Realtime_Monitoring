@@ -1,0 +1,13 @@
+# TLS cert/key generated locally in Phase 3 — never commit private keys
+manifests/rtp-tls.key
+manifests/rtp-tls.crt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local SQLite data (if ever generated outside a container)
+*.db
+
+# Locust generated reports
+locust/*.csv
