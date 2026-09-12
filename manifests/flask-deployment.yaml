@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: flask-app
-          image: rtp-platform-app:latest
+          image: rtakashdev/rtp-platform-app:79b5608d5ffcf72a321a87ed5fd40376516a06a6
           imagePullPolicy: IfNotPresent   # so Minikube uses your local image
           ports:
             - containerPort: 5000
