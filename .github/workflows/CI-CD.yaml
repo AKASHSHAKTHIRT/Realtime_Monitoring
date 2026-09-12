@@ -13,7 +13,7 @@ jobs:
       -name:checkout code
        uses:actions/cyesheckout@v4
       -name: Log in to Docker Hub
-       uses:docker/login-action@V3
+       uses: docker/login-action@V3
        with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
