@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rtp-ingress
+  annotations:
+    # Tells the Nginx Ingress Controller to redirect any plain HTTP
+    # request to HTTPS automatically.
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx   # tells Kubernetes: use the Nginx Ingress
+                             # Controller we installed via the addon
+  tls:
+    - hosts:
+        - rtp.local
+      secretName: rtp-tls-secret   # <-- the cert+key Secret we created
+  rules:
+    - host: rtp.local              # <-- must match your hosts file entry
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flask-service   # <-- routes to the Service from Phase 1
+                port:
+                  number: 80

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 10s   # how often Prometheus pulls metrics
+
+    scrape_configs:
+      # Scrape metrics from OUR Flask app's /metrics endpoint (cache
+      # hits/misses, request latency — the custom metrics we added).
+      # Node/pod CPU & memory are already covered by metrics-server,
+      # which HPA and `kubectl top` use directly — no need to
+      # duplicate that here.
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          # Only scrape pods that explicitly opt in via this annotation,
+          # so we don't try to scrape every random pod in the cluster.
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod

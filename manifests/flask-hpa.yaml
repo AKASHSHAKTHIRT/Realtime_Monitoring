@@ -1,0 +1,34 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: flask-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: flask-app          # <-- must match the Deployment name from Phase 1
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50   # scale up once avg CPU usage across
+                                     # pods crosses 50% of the REQUESTED
+                                     # cpu (100m, set in flask-deployment.yaml)
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 15   # react fast to spikes
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 60   # wait longer before scaling down,
+                                         # to avoid flapping on brief lulls
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 30

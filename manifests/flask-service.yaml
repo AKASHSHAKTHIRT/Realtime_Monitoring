@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-service
+spec:
+  type: ClusterIP          # internal-only stable IP + DNS name
+  selector:
+    app: flask-app         # picks up any Pod with this label — this is the
+                            # live link between Service and Pods we discussed
+  ports:
+    - port: 80              # what other things inside the cluster connect to
+      targetPort: 5000       # forwarded to this port inside the container

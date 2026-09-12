@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+  labels:
+    app: flask-app
+spec:
+  replicas: 2   # HPA will take over control of this field later (Phase 4)
+  selector:
+    matchLabels:
+      app: flask-app   # <-- must match the Pod template's label below
+  template:
+    metadata:
+      labels:
+        app: flask-app   # <-- this is what the Service's selector will match
+      annotations:
+        prometheus.io/scrape: "true"   # opts this pod into Prometheus scraping
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: flask-app
+          image: rtp-platform-app:latest
+          imagePullPolicy: IfNotPresent   # so Minikube uses your local image
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10

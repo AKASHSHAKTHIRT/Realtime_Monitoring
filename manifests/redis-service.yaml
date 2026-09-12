@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service   # <-- this exact name is what app.py connects to
+                          #     (REDIS_HOST env var defaults to this)
+spec:
+  type: ClusterIP        # internal-only — Redis should NEVER be exposed
+                          # outside the cluster
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
